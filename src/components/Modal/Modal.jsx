@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { useRef } from 'react';
 import { useDispatch } from 'react-redux';
@@ -30,7 +29,7 @@ export const Modal = ({ children, isOpen }) => {
   const ref = useRef();
 
   const onClose = () => {
-    // довольно костыльно диспатчить это в модалке в отрыве от самой формы
+    // наверное, костыльно диспатчить это в модалке в отрыве от самой формы
     dispatch(resetEditForm());
     history.push(process.env.REACT_APP_HOMEPAGE);
   };
@@ -41,11 +40,9 @@ export const Modal = ({ children, isOpen }) => {
     isOpen && (
       <div className="modal_wrapper">
         <div className="modal" ref={ref}>
-          <Link to={process.env.REACT_APP_HOMEPAGE}>
-            <button className="modal_close-btn" onClick={onClose}>
-              ×
-            </button>
-          </Link>
+          <button className="modal_close-btn" onClick={onClose}>
+            ×
+          </button>
           {children}
         </div>
       </div>

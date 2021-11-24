@@ -91,7 +91,7 @@ export const editServiceFailure = (error) => {
   return { type: EDIT_SERVICE_FAILURE, payload: { error } };
 };
 
-export const fetchFullService = async (dispatch, id) => {
+export const fetchFullService = (id) => async (dispatch) => {
   try {
     const data = await getResponse({
       url: `${process.env.REACT_APP_API_SERVICES}/${id}`,
@@ -103,7 +103,7 @@ export const fetchFullService = async (dispatch, id) => {
   }
 };
 
-export const fetchServices = async (dispatch) => {
+export const fetchServices = () => async (dispatch) => {
   dispatch(fetchServicesRequest());
   try {
     const data = await getResponse({ url: process.env.REACT_APP_API_SERVICES });
@@ -114,7 +114,7 @@ export const fetchServices = async (dispatch) => {
   }
 };
 
-export const fetchAddService = async (dispatch, item, history) => {
+export const fetchAddService = (item, history) => async (dispatch) => {
   dispatch(addServiceRequest());
   try {
     const data = await getResponse({
@@ -131,7 +131,7 @@ export const fetchAddService = async (dispatch, item, history) => {
   }
 };
 
-export const fetchEditService = async (dispatch, item, history) => {
+export const fetchEditService = (item, history) => async (dispatch) => {
   dispatch(editServiceRequest());
   try {
     const data = await getResponse({
@@ -148,7 +148,7 @@ export const fetchEditService = async (dispatch, item, history) => {
   }
 };
 
-export const fetchRemoveService = async (dispatch, id) => {
+export const fetchRemoveService = (id) => async (dispatch) => {
   const response = await fetch(`${process.env.REACT_APP_API_SERVICES}/${id}`, {
     method: 'DELETE',
   });

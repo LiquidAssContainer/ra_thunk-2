@@ -44,14 +44,14 @@ export const serviceListReducer = (state = initialState, { type, payload }) => {
       const { id } = payload;
       return {
         ...state,
-        services: state.services.filter((service) => service.id != id),
+        services: state.services.filter((service) => service.id !== id),
       };
     }
 
     case EDIT_SERVICE: {
       const { id, name, price, content } = payload;
       const serviceIndex = state.services.findIndex(
-        (service) => service.id == id,
+        (service) => service.id === id,
       );
       const newServiceList = [...state.services];
       newServiceList[serviceIndex] = { id, name, price, content };

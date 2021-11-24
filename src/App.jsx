@@ -37,7 +37,7 @@ export const App = () => {
   };
 
   useEffect(() => {
-    fetchServices(dispatch);
+    dispatch(fetchServices());
   }, [dispatch]);
 
   return (

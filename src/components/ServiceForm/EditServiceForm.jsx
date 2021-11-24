@@ -23,14 +23,14 @@ export const EditServiceForm = ({ id }) => {
 
   const onFormSubmit = ({ id, name, price, content }) => {
     if (name && price && content) {
-      fetchEditService(dispatch, { id, name, price, content }, history);
+      dispatch(fetchEditService({ id, name, price, content }, history));
     } else {
       console.log('Тут должна быть какая-нибудь модалка или попап');
     }
   };
 
   useEffect(() => {
-    fetchFullService(dispatch, id);
+    dispatch(fetchFullService(id));
   }, []);
 
   return (

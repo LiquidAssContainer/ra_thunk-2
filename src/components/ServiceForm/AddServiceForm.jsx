@@ -21,7 +21,7 @@ export const AddServiceForm = () => {
 
   const onFormSubmit = ({ name, price, content }) => {
     if (name && price && content) {
-      fetchAddService(dispatch, { name, price, content }, history);
+      dispatch(fetchAddService({ name, price, content }, history));
     } else {
       console.log('Тут должна быть какая-нибудь модалка или попап');
     }

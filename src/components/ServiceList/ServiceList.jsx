@@ -1,6 +1,5 @@
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { useHistory } from 'react-router';
 
 import { fetchRemoveService } from '../../actions/actionCreators';
 
@@ -16,14 +15,9 @@ export const ServiceList = ({ services }) => {
 
 const ServiceItem = ({ name, price, id }) => {
   const dispatch = useDispatch();
-  const history = useHistory();
 
   const onRemove = () => {
-    fetchRemoveService(dispatch, id);
-  };
-
-  const onEdit = () => {
-    history.push(process.env.REACT_APP_HOMEPAGE);
+    dispatch(fetchRemoveService(id));
   };
 
   return (
@@ -34,7 +28,7 @@ const ServiceItem = ({ name, price, id }) => {
       </div>
       <div className="service-item_controls">
         <Link to={`${process.env.REACT_APP_HOMEPAGE}/${id}`}>
-          <Button onClick={onEdit} label="Edit" />
+          <Button label="Edit" />
         </Link>
         <Button onClick={onRemove} label="Remove" />
       </div>
