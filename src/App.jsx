@@ -14,7 +14,8 @@ import { ServiceList } from './components/ServiceList/ServiceList';
 import { LoadingSpinner } from './components/ServiceList/LoadingSpinner';
 import { ErrorPopup } from './components/ServiceList/ErrorPopup';
 
-import { fetchServices } from './actions/actionCreators';
+import { getServicesAsync } from './reducers/serviceList';
+
 import './styles/app.css';
 
 export const App = () => {
@@ -26,9 +27,11 @@ export const App = () => {
   const [filtered, setFiltered] = useState('');
 
   const filterByString = (string, services) => {
-    return services.filter((service) =>
-      service.name.toLowerCase().includes(string.toLowerCase()),
-    );
+    return string
+      ? services.filter((service) =>
+          service.name.toLowerCase().includes(string.toLowerCase()),
+        )
+      : null;
   };
 
   const onFilter = (string) => {
@@ -37,12 +40,12 @@ export const App = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchServices());
+    dispatch(getServicesAsync());
   }, [dispatch]);
 
   return (
     <Router>
-      <Route exact path={['/', '/ra_thunk']}>
+      <Route exact path={['/']}>
         {/*HOMEPAGE добавил из-за нюанса на GitHub Pages, такое вот костыльное решение*/}
         <Redirect to={process.env.REACT_APP_HOMEPAGE} />
       </Route>

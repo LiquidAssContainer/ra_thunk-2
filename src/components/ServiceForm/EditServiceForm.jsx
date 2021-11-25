@@ -2,14 +2,14 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
-import {
-  changeEditServiceField,
-  fetchEditService,
-  fetchFullService,
-} from '../../actions/actionCreators';
-
 import { ServiceForm } from './ServiceForm';
 import { ErrorPopup } from '../ServiceList/ErrorPopup';
+
+import {
+  changeEditServiceField,
+  editServiceAsync,
+  getServiceAsync,
+} from '../../reducers/editService';
 
 export const EditServiceForm = ({ id }) => {
   const dispatch = useDispatch();
@@ -18,19 +18,21 @@ export const EditServiceForm = ({ id }) => {
   const { loading, error } = useSelector((state) => state.editService);
 
   const onInputChange = (name, value) => {
-    dispatch(changeEditServiceField(name, value));
+    dispatch(changeEditServiceField({ name, value }));
   };
 
   const onFormSubmit = ({ id, name, price, content }) => {
     if (name && price && content) {
-      dispatch(fetchEditService({ id, name, price, content }, history));
+      dispatch(
+        editServiceAsync({ service: { id, name, price, content }, history }),
+      );
     } else {
       console.log('Тут должна быть какая-нибудь модалка или попап');
     }
   };
 
   useEffect(() => {
-    dispatch(fetchFullService(id));
+    dispatch(getServiceAsync(id));
   }, []);
 
   return (

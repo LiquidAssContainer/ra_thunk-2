@@ -1,11 +1,12 @@
-import { useHistory } from 'react-router';
 import { useRef } from 'react';
+import { useHistory } from 'react-router';
 import { useDispatch } from 'react-redux';
 
-import { useOnClickOutside } from '../../hooks/useOnClickOutside';
-import { resetEditForm } from '../../actions/actionCreators';
 import { EditServiceForm } from '../ServiceForm/EditServiceForm';
 import { AddServiceForm } from '../ServiceForm/AddServiceForm';
+
+import { useOnClickOutside } from '../../hooks/useOnClickOutside';
+import { resetEditForm } from '../../reducers/editService';
 
 export const AddServiceModal = () => {
   return (

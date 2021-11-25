@@ -1,12 +1,6 @@
-import {
-  CHANGE_EDIT_SERVICE_FIELD,
-  FILL_EDIT_FORM,
-  RESET_EDIT_FORM,
-  EDIT_SERVICE_REQUEST,
-  EDIT_SERVICE_FAILURE,
-  EDIT_SERVICE_SUCCESS,
-  GET_SERVICE,
-} from '../actions/actionTypes';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getResponse } from '../lib/getResponse';
+import { editService } from './serviceList';
 
 const initialState = {
   service: {
@@ -19,41 +13,77 @@ const initialState = {
   error: null,
 };
 
-export const editServiceReducer = (state = initialState, { type, payload }) => {
-  switch (type) {
-    case GET_SERVICE: {
-      const { id, name, price, content } = payload;
-      return { ...state, service: { id, name, price, content } };
+export const getServiceAsync = createAsyncThunk(
+  'editService/fetchFullService',
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await getResponse({
+        url: `${process.env.REACT_APP_API_SERVICES}/${id}`,
+      });
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
     }
+  },
+);
 
-    case CHANGE_EDIT_SERVICE_FIELD: {
+export const editServiceAsync = createAsyncThunk(
+  'editService/fetchEditService',
+  async ({ service, history }, { dispatch, rejectWithValue }) => {
+    try {
+      const data = await getResponse({
+        url: `${process.env.REACT_APP_API_SERVICES}/${service.id}`,
+        method: 'PUT',
+        data: service,
+      });
+      dispatch(editService(data));
+      dispatch(resetEditForm());
+      history.push(process.env.REACT_APP_HOMEPAGE);
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  },
+);
+
+export const editServiceSlice = createSlice({
+  name: 'editService',
+  initialState,
+  reducers: {
+    getService: (state, { payload }) => {
+      state.service = payload;
+    },
+    changeEditServiceField: (state, { payload }) => {
       const { name, value } = payload;
-      return { ...state, service: { ...state.service, [name]: value } };
-    }
+      state.service[name] = value;
+    },
+    resetEditForm: (state) => {
+      state.service = initialState.service;
+      state.loading = false;
+      state.error = null;
+    },
+  },
+  extraReducers: {
+    [getServiceAsync.fulfilled]: (state, { payload }) => {
+      state.service = payload;
+    },
+    [editServiceAsync.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [editServiceAsync.fulfilled]: (state) => {
+      state.service = initialState.service;
+      state.loading = false;
+      state.error = null;
+    },
+    [editServiceAsync.rejected]: (state, { payload }) => {
+      state.error = payload;
+      state.loading = false;
+    },
+  },
+});
 
-    case EDIT_SERVICE_REQUEST: {
-      return { ...state, loading: true, error: null };
-    }
+export const { getService, changeEditServiceField, resetEditForm } =
+  editServiceSlice.actions;
 
-    case EDIT_SERVICE_FAILURE: {
-      const { error } = payload;
-      return { ...state, loading: false, error };
-    }
-
-    case EDIT_SERVICE_SUCCESS: {
-      return { ...initialState };
-    }
-
-    case FILL_EDIT_FORM: {
-      const { id, name, price, content } = payload;
-      return { ...state, service: { id, name, price, content } };
-    }
-
-    case RESET_EDIT_FORM: {
-      return { ...initialState };
-    }
-
-    default:
-      return state;
-  }
-};
+export const editServiceReducer = editServiceSlice.reducer;

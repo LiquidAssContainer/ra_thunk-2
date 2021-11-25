@@ -1,7 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-
-import { fetchRemoveService } from '../../actions/actionCreators';
+import { removeServiceAsync } from '../../reducers/serviceList';
 
 export const ServiceList = ({ services }) => {
   return (
@@ -17,7 +16,7 @@ const ServiceItem = ({ name, price, id }) => {
   const dispatch = useDispatch();
 
   const onRemove = () => {
-    dispatch(fetchRemoveService(id));
+    dispatch(removeServiceAsync(id));
   };
 
   return (

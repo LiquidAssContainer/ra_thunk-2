@@ -1,11 +1,5 @@
-import {
-  ADD_SERVICE,
-  REMOVE_SERVICE,
-  EDIT_SERVICE,
-  FETCH_SERVICES_REQUEST,
-  FETCH_SERVICES_FAILURE,
-  FETCH_SERVICES_SUCCESS,
-} from '../actions/actionTypes';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getResponse } from '../lib/getResponse';
 
 const initialState = {
   services: [],
@@ -13,56 +7,71 @@ const initialState = {
   error: null,
 };
 
-export const serviceListReducer = (state = initialState, { type, payload }) => {
-  switch (type) {
-    case FETCH_SERVICES_REQUEST:
-      return { ...state, loading: true, error: null };
-
-    case FETCH_SERVICES_FAILURE:
-      const { error } = payload;
-      return { ...state, loading: false, error };
-
-    case FETCH_SERVICES_SUCCESS:
-      const { items } = payload;
-      return {
-        ...initialState,
-        services: items,
-      };
-
-    case ADD_SERVICE: {
-      const { id, name, price, content } = payload;
-      return {
-        ...state,
-        services: [
-          ...state.services,
-          { id, name, price: Number(price), content },
-        ],
-      };
+export const getServicesAsync = createAsyncThunk(
+  'serviceList/fetchServices',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await getResponse({
+        url: process.env.REACT_APP_API_SERVICES,
+      });
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
     }
+  },
+);
 
-    case REMOVE_SERVICE: {
-      const { id } = payload;
-      return {
-        ...state,
-        services: state.services.filter((service) => service.id !== id),
-      };
-    }
+export const removeServiceAsync = createAsyncThunk(
+  'editService/fetchRemoveService',
+  async (id, { dispatch }) => {
+    try {
+      await fetch(`${process.env.REACT_APP_API_SERVICES}/${id}`, {
+        method: 'DELETE',
+      });
+      dispatch(removeService(id));
+    } catch {}
+  },
+);
 
-    case EDIT_SERVICE: {
+export const serviceListSlice = createSlice({
+  name: 'serviceList',
+  initialState,
+  reducers: {
+    addService: (state, { payload }) => {
       const { id, name, price, content } = payload;
-      const serviceIndex = state.services.findIndex(
-        (service) => service.id === id,
+      const newService = { id, name, price: Number(price), content };
+      state.services.push(newService);
+    },
+    removeService: (state, { payload }) => {
+      state.services = state.services.filter(
+        (service) => service.id !== payload,
       );
-      const newServiceList = [...state.services];
-      newServiceList[serviceIndex] = { id, name, price, content };
+    },
+    editService: (state, { payload }) => {
+      const serviceIndex = state.services.findIndex(
+        (service) => service.id === payload.id,
+      );
+      state.services[serviceIndex] = payload;
+    },
+  },
+  extraReducers: {
+    [getServicesAsync.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [getServicesAsync.fulfilled]: (state, { payload }) => {
+      state.services = payload;
+      state.loading = false;
+      state.error = null;
+    },
+    [getServicesAsync.rejected]: (state, { payload }) => {
+      state.error = payload;
+      state.loading = false;
+    },
+  },
+});
 
-      return {
-        ...state,
-        services: newServiceList,
-      };
-    }
+export const { addService, removeService, editService } =
+  serviceListSlice.actions;
 
-    default:
-      return state;
-  }
-};
+export const serviceListReducer = serviceListSlice.reducer;
